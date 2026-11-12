@@ -184,31 +184,35 @@ void MX_FREERTOS_Init(void) {
 void StartkeyTask(void *argument)
 {
   /* USER CODE BEGIN StartkeyTask */
-  (void)argument;
+  (void) argument;
   /* Infinite loop */
-  int flag1=0;
-  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1,500u);
-  for(;;)
+  int flag1 = 0;
+  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 500u);
+  for (;;)
   {
-    if (key_pressed==1&&(HAL_GetTick()-key_tick>=30)) {
-      if (flag1==0) {
-        servo_angle+=20;
-        if (servo_angle>=180) {
-          flag1=1;
-          servo_angle=180;
+    if (key_pressed == 1 && (HAL_GetTick() - key_tick >= 30))
+    {
+      if (flag1 == 0)
+      {
+        servo_angle += 20;
+        if (servo_angle >= 180)
+        {
+          flag1 = 1;
+          servo_angle = 180;
         }
       }
-      else {
-       servo_angle-=20;
-        if (servo_angle<=0) {
-          flag1=0;
-          servo_angle=0;
+      else
+      {
+        servo_angle -= 20;
+        if (servo_angle <= 0)
+        {
+          flag1 = 0;
+          servo_angle = 0;
         }
       }
       __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1,
-                  500u+(uint32_t)servo_angle * 2000u / 180u);
-      key_pressed=0;
-
+                            500u+(uint32_t)servo_angle * 2000u / 180u);
+      key_pressed = 0;
     }
     osDelay(10);
   }
@@ -225,9 +229,9 @@ void StartkeyTask(void *argument)
 void StartmotorTask(void *argument)
 {
   /* USER CODE BEGIN StartmotorTask */
-  (void)argument;
+  (void) argument;
   /* Infinite loop */
-  for(;;)
+  for (;;)
   {
     motor_parameter.now = HAL_GetTick();
     if (motor_parameter.now - motor_parameter.last_time >= 100)
@@ -239,8 +243,8 @@ void StartmotorTask(void *argument)
     else
     {
       motor_online = 1;
-      PID_Calc(&speed_pid, speed_target, (float)motor_parameter.speed);
-      CAN_cmd_chassis((int16_t)speed_pid.out, 0, 0, 0);
+      PID_Calc(&speed_pid, speed_target, (float) motor_parameter.speed);
+      CAN_cmd_chassis((int16_t) speed_pid.out, 0, 0, 0);
     }
 
 
@@ -259,13 +263,13 @@ void StartmotorTask(void *argument)
 void StartuartrxTask(void *argument)
 {
   /* USER CODE BEGIN StartuartrxTask */
-  (void)argument;
+  (void) argument;
   /* Infinite loop */
   uint16_t ch;
-  char     line[32];
-  uint8_t  idx = 0;
+  char line[32];
+  uint8_t idx = 0;
 
-  for(;;)
+  for (;;)
   {
     if (osMessageQueueGet(uartQueueHandle, &ch, NULL, osWaitForever) == osOK)
     {
@@ -274,14 +278,17 @@ void StartuartrxTask(void *argument)
         if (idx > 0)
         {
           line[idx] = '\0';
-          if (strncmp(line, "motor", 5) == 0&&idx>6) {
-            if (line[5] == '+') {
-              speed_target =  (float)atoi(&line[6]);
+          if (strncmp(line, "motor", 5) == 0 && idx > 6)
+          {
+            if (line[5] == '+')
+            {
+              speed_target = (float) atoi(&line[6]);
             }
-            if (line[5] == '-') {
-              speed_target = -(float)atoi(&line[6]);
-          }
-            if (speed_target >  150.0f) speed_target =  150.0f;
+            if (line[5] == '-')
+            {
+              speed_target = -(float) atoi(&line[6]);
+            }
+            if (speed_target > 150.0f) speed_target = 150.0f;
             if (speed_target < -150.0f) speed_target = -150.0f;
           }
           idx = 0;
@@ -289,7 +296,7 @@ void StartuartrxTask(void *argument)
       }
       else if (idx < sizeof(line) - 1)
       {
-        line[idx] = (char)ch;
+        line[idx] = (char) ch;
         idx++;
       }
     }
@@ -307,34 +314,37 @@ void StartuartrxTask(void *argument)
 void StartledTask(void *argument)
 {
   /* USER CODE BEGIN StartledTask */
-  (void)argument;
+  (void) argument;
   int32_t duty = 0;
   int32_t step = 20;
-  int8_t flag2=0;
+  int8_t flag2 = 0;
   /* Infinite loop */
-  for(;;)
+  for (;;)
   {
     if (motor_online == 1)
     {
       __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_2, 1000);
-  __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_3, 0);
-    }
-    else
+      __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_3, 0);
+    } else
     {
       __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_2, 0);
 
-      if (flag2==0) {
-        duty+=step;
-        if (duty>=1000) {
-          duty=1000;
-          flag2=1;
+      if (flag2 == 0)
+      {
+        duty += step;
+        if (duty >= 1000)
+        {
+          duty = 1000;
+          flag2 = 1;
         }
       }
-      else {
-        duty -=step;
-        if (duty<=0) {
-          duty=0;
-          flag2=0;
+      else
+      {
+        duty -= step;
+        if (duty <= 0)
+        {
+          duty = 0;
+          flag2 = 0;
         }
       }
 
@@ -356,17 +366,17 @@ void StartledTask(void *argument)
 void StartuarttxTask(void *argument)
 {
   /* USER CODE BEGIN StartuarttxTask */
-  (void)argument;
+  (void) argument;
   /* Infinite loop */
   char buf[64];
-  int  len;
+  int len;
 
-  for(;;)
+  for (;;)
   {
     len = snprintf(buf, sizeof(buf), "spd=%d\r\n",
-   (int)speed_pid.back);
+                   (int) speed_pid.back);
 
-    HAL_UART_Transmit(&huart6, (uint8_t *)buf, (uint16_t)len, 100);
+    HAL_UART_Transmit(&huart6, (uint8_t *) buf, (uint16_t) len, 100);
 
     osDelay(2000);
   }
@@ -379,21 +389,23 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   if (GPIO_Pin == KEY_Pin)
   {
-    if (HAL_GPIO_ReadPin(KEY_GPIO_Port,KEY_Pin)==GPIO_PIN_RESET) {
-      key_tick=HAL_GetTick();
+    if (HAL_GPIO_ReadPin(KEY_GPIO_Port,KEY_Pin) == GPIO_PIN_RESET)
+    {
+      key_tick = HAL_GetTick();
       key_pressed = 1;
     }
   }
 }
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-if (huart->Instance ==USART6)
-    {
-  uint16_t v = (uint16_t)rx_byte;
-         osMessageQueuePut(uartQueueHandle, &v, 0, 0);
-     HAL_UART_Receive_IT(&huart6, &rx_byte, 1);
+  if (huart->Instance == USART6)
+  {
+    uint16_t v = (uint16_t) rx_byte;
+    osMessageQueuePut(uartQueueHandle, &v, 0, 0);
+    HAL_UART_Receive_IT(&huart6, &rx_byte, 1);
   }
- }
+}
 
 /* USER CODE END Application */
 
