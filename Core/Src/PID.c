@@ -101,7 +101,11 @@ void PID_Calc(PID_t *pid, float target, float feedback)
   pid->last_error = pid->error;
 }
 
-
+/**
+ * @brief 清空存储数据
+ * @param pid 指向pid结构体
+ * @retval 无
+ */
 void PID_Reset(PID_t *pid)
 {
   if (pid == NULL)
