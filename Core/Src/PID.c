@@ -20,7 +20,7 @@ void PID_Init(PID_t *pid,
               float kp,
               float ki,
               float kd,
-              float maxout,
+              float out_max,
               float integral_max,
               float integral_separate_threshold,
               uint8_t mode)
@@ -31,19 +31,19 @@ void PID_Init(PID_t *pid,
     pid->kp = kp;
     pid->ki = ki;
     pid->kd = kd;
-    pid->out_max = fabsf(maxout);
+    pid->out_max = fabsf(out_max);
     pid->integral_max = fabsf(integral_max);
     pid->integral_separate_threshold = fabsf(integral_separate_threshold);
     pid->mode = mode;
   }
 }
 
-void PID_Calc(PID_t *pid, float target, float back)
+void PID_Calc(PID_t *pid, float target, float feedback)
 {
   if (pid == NULL)
     return;
   pid->target = target;
-  pid->feedback = back;
+  pid->feedback = feedback;
   pid->error = pid->target - pid->feedback;
   pid->p_out = pid->error * pid->kp;
 

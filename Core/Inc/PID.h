@@ -44,7 +44,7 @@ void PID_Init(PID_t *pid,
 
 void PID_Calc(PID_t *pid,
               float target,
-              float back);
+              float feedback);
 
 void PID_Reset(PID_t *pid);
 
