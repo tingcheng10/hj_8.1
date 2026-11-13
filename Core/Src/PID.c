@@ -51,6 +51,13 @@ void PID_Init(PID_t *pid,
   }
 }
 
+/**
+ *@brief 算p/i/d，相加限幅后存误差
+ * @param pid 指向pid结构体
+ * @param target 目标转速/rpm
+ * @param feedback pid计算后的返回转速/rpm
+ * @retval 无
+ */
 void PID_Calc(PID_t *pid, float target, float feedback)
 {
   if (pid == NULL)
@@ -93,6 +100,7 @@ void PID_Calc(PID_t *pid, float target, float feedback)
   }
   pid->last_error = pid->error;
 }
+
 
 void PID_Reset(PID_t *pid)
 {
