@@ -73,10 +73,10 @@ void CAN_cmd_chassis(int16_t motor1, int16_t motor2, int16_t motor3, int16_t mot
 
 static void Motor_ParseRxData(void)
 {
-  motor_parameter.angle = (uint16_t) ((uint16_t) rx_data[0] << 8) | rx_data[1];
-  motor_parameter.speed = (int16_t) ((uint16_t) rx_data[2] << 8) | rx_data[3];
-  motor_parameter.current = (int16_t) ((uint16_t) rx_data[4] << 8) | rx_data[5];
-  motor_parameter.temp = rx_data[6];
+  motor_parameter.angle_raw = (uint16_t) ((uint16_t) rx_data[0] << 8) | rx_data[1];
+  motor_parameter.speed_rpm = (int16_t) ((uint16_t) rx_data[2] << 8) | rx_data[3];
+  motor_parameter.current_raw = (int16_t) ((uint16_t) rx_data[4] << 8) | rx_data[5];
+  motor_parameter.temperature_c = rx_data[6];
 }
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
@@ -91,7 +91,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
   }
   if (rx_header.StdId == MOTOR_CAN_RX_ID)
   {
-    motor_parameter.last_time = motor_parameter.now;
+    motor_parameter.last_rx_time_ms = motor_parameter.now_tick_ms;
     Motor_ParseRxData();
   }
 }

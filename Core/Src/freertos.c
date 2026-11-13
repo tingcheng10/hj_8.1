@@ -234,8 +234,8 @@ void StartmotorTask(void *argument)
   /* Infinite loop */
   for (;;)
   {
-    motor_parameter.now = HAL_GetTick();
-    if (motor_parameter.now - motor_parameter.last_time >= 100)
+    motor_parameter.now_tick_ms = HAL_GetTick();
+    if (motor_parameter.now_tick_ms - motor_parameter.last_rx_time_ms >= 100)
     {
       motor_online = 0;
       PID_Reset(&speed_pid);
@@ -244,7 +244,7 @@ void StartmotorTask(void *argument)
     else
     {
       motor_online = 1;
-      PID_Calc(&speed_pid, speed_target, (float) motor_parameter.speed);
+      PID_Calc(&speed_pid, speed_target, (float) motor_parameter.speed_rpm);
       CAN_cmd_chassis((int16_t) speed_pid.out, 0, 0, 0);
     }
 

@@ -104,7 +104,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   CAN_FILTER_Init(&CHASSIS_CAN);
   CAN_Init(&CHASSIS_CAN);
-  motor_parameter.last_time = HAL_GetTick();
+  motor_parameter.last_rx_time_ms = HAL_GetTick();
   PID_Init(&speed_pid, 50.0f, 0.5f, 0.0f, 15000.0f, 10000.0f, 30.0f, LIMITING);
   speed_target = 0.0f;
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
