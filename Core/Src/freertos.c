@@ -245,7 +245,7 @@ void StartmotorTask(void *argument)
     {
       motor_online = 1;
       PID_Calc(&speed_pid, speed_target, (float) motor_parameter.speed_rpm);
-      CAN_CmdChassis((int16_t) speed_pid.out, 0, 0, 0);
+      CAN_CmdChassis((int16_t) speed_pid.output, 0, 0, 0);
     }
 
 
@@ -375,7 +375,7 @@ void StartuarttxTask(void *argument)
   for (;;)
   {
     len = snprintf(buf, sizeof(buf), "spd=%d\r\n",
-                   (int) speed_pid.back);
+                   (int) speed_pid.feedback);
 
     HAL_UART_Transmit(&huart6, (uint8_t *) buf, (uint16_t) len, 100);
 

@@ -15,17 +15,17 @@ typedef struct
   float kp;
   float ki;
   float kd;
-  float e; //误差
-  float last_e; //上次误差
+  float error; //误差
+  float last_error; //上次误差
   float target; //目标
-  float out; //输出电压
+  float output; //输出电压
   float pout;
   float iout;
   float dout;
   float maxout; //输出限幅
   float imaxout1; //积分限幅
   float imaxout2; //积分分离值rpm
-  float back; //实际转速
+  float feedback; //实际转速
   uint8_t mode;
 } PID_t;
 
