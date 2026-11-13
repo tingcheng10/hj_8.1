@@ -5,9 +5,6 @@
  *      Author: tingcheng
  */
 
-#ifndef INC_CAN_MOTOR_C_
-#define INC_CAN_MOTOR_C_
-
 #include "can_motor.h"
 
 MotorParam_t motor_parameter;
@@ -99,5 +96,3 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
   }
 }
 
-
-#endif /* INC_CAN_MOTOR_C_ */

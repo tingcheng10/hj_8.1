@@ -5,8 +5,7 @@
  *      Author: tingcheng
  */
 
-#ifndef SRC_PID_C_
-#define SRC_PID_C_
+
 #include<math.h>
 #include<string.h>
 #include"main.h"
@@ -94,5 +93,3 @@ void PID_Reset(PID_t *pid)
   pid->out = 0.0f;
 }
 
-
-#endif /* SRC_PID_C_ */
