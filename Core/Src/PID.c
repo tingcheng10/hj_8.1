@@ -48,7 +48,7 @@ void PID_Calc(PID_t *pid, float target, float back)
   pid->e = pid->target - pid->back;
   pid->pout = pid->e * pid->kp;
 
-  if (pid->mode == limiting)
+  if (pid->mode == LIMITING)
   {
     pid->iout += pid->ki * pid->e;
   }

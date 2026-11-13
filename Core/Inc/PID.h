@@ -7,8 +7,8 @@
 
 #ifndef SRC_PID_H_
 #define SRC_PID_H_
-#define limiting 1
-#define separating 0
+#define LIMITING 1
+#define SEPARATING 0
 
 typedef struct
 {

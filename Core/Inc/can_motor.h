@@ -10,9 +10,9 @@
 #include"main.h"
 extern CAN_HandleTypeDef hcan1;
 
-void RIGHTHANDLE(void);
+void Motor_RightHandle(void);
 
-void ERRORHANDLE(void);
+void Motor_ErrorHandle(void);
 
 void CAN_Init(CAN_HandleTypeDef *hcan);
 
@@ -32,9 +32,9 @@ typedef struct {
   volatile int16_t current;
   volatile uint32_t last_time;
   volatile uint32_t now;
-} motor_par;
+} MotorParam_t;
 
-extern motor_par motor_parameter;
+extern MotorParam_t motor_parameter;
 
 
 #endif /* CAN_MOTOR_H_ */
