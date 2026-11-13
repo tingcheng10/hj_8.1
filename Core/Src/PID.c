@@ -54,8 +54,8 @@ void PID_Init(PID_t *pid,
 /**
  *@brief 算p/i/d，相加限幅后存误差
  * @param pid 指向pid结构体
- * @param target 目标转速/rpm
- * @param feedback pid计算后的返回转速/rpm
+ * @param target 电机目标转速/rpm
+ * @param feedback 电机实际转速/rpm
  * @retval 无
  */
 void PID_Calc(PID_t *pid, float target, float feedback)
