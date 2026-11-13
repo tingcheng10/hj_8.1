@@ -12,10 +12,10 @@ static uint8_t tx_data[8];
 static uint8_t rx_data[8];
 static CAN_TxHeaderTypeDef chassis_tx_message;
 static CAN_RxHeaderTypeDef rx_header;
-static uint32_t send_mail_box;
+static uint32_t send_mailbox;
 
 
-void CAN_FILTER_Init(CAN_HandleTypeDef *hcan)
+void CAN_FilterInit(CAN_HandleTypeDef *hcan)
 {
   CAN_FilterTypeDef filter = {0};
 
@@ -58,7 +58,7 @@ void CAN_Init(CAN_HandleTypeDef *hcan)
   }
 }
 
-void CAN_cmd_chassis(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4)
+void CAN_CmdChassis(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4)
 {
   tx_data[0] = (uint8_t) (motor1 >> 8);
   tx_data[1] = (uint8_t) (motor1 & 0xff);
@@ -68,7 +68,7 @@ void CAN_cmd_chassis(int16_t motor1, int16_t motor2, int16_t motor3, int16_t mot
   tx_data[5] = (uint8_t) (motor3 & 0xff);
   tx_data[6] = (uint8_t) (motor4 >> 8);
   tx_data[7] = (uint8_t) (motor4 & 0xff);
-  HAL_CAN_AddTxMessage(&CHASSIS_CAN, &chassis_tx_message, tx_data, &send_mail_box);
+  HAL_CAN_AddTxMessage(&CHASSIS_CAN, &chassis_tx_message, tx_data, &send_mailbox);
 }
 
 static void Motor_ParseRxData(void)

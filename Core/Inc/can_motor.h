@@ -16,14 +16,14 @@ void Motor_ErrorHandle(void);
 
 void CAN_Init(CAN_HandleTypeDef *hcan);
 
-void CAN_cmd_chassis(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4);
+void CAN_CmdChassis(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4);
 
 
 #define CAN_CHASSIS_ALL_ID 0x1FF
 #define CHASSIS_CAN hcan1
 #define MOTOR_CAN_RX_ID (0x204+1)
 
-void CAN_FILTER_Init(CAN_HandleTypeDef *hcan);
+void CAN_FilterInit(CAN_HandleTypeDef *hcan);
 
 typedef struct {
   volatile uint16_t temperature_c;

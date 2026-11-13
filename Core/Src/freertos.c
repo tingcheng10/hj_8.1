@@ -61,7 +61,7 @@
 volatile uint8_t motor_online = 0;
 volatile int32_t servo_angle_deg  = 0;
 volatile uint8_t key_pressed = 0;
-volatile uint32_t key_last_tick_mss = 0;
+volatile uint32_t key_last_tick_ms = 0;
 
 /* USER CODE END Variables */
 /* Definitions for keyTask */
@@ -239,13 +239,13 @@ void StartmotorTask(void *argument)
     {
       motor_online = 0;
       PID_Reset(&speed_pid);
-      CAN_cmd_chassis(0, 0, 0, 0);
+      CAN_CmdChassis(0, 0, 0, 0);
     }
     else
     {
       motor_online = 1;
       PID_Calc(&speed_pid, speed_target, (float) motor_parameter.speed_rpm);
-      CAN_cmd_chassis((int16_t) speed_pid.out, 0, 0, 0);
+      CAN_CmdChassis((int16_t) speed_pid.out, 0, 0, 0);
     }
 
 

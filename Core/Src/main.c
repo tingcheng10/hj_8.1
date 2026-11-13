@@ -102,7 +102,7 @@ int main(void)
   MX_USART6_UART_Init();
   MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
-  CAN_FILTER_Init(&CHASSIS_CAN);
+  CAN_FilterInit(&CHASSIS_CAN);
   CAN_Init(&CHASSIS_CAN);
   motor_parameter.last_rx_time_ms = HAL_GetTick();
   PID_Init(&speed_pid, 50.0f, 0.5f, 0.0f, 15000.0f, 10000.0f, 30.0f, LIMITING);
