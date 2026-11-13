@@ -16,11 +16,24 @@ PID_t angle_pid;
 PID_t speed_pid;
 volatile float speed_target = 0.0f;
 
+/**
+ *@brief 初始化一个 PID 控制器：清零结构体并写入 Kp/Ki/Kd、限幅和模式
+ * @param pid 指向要初始化的 PID 结构体
+ * @param kp 比例系数
+ * @param ki 积分系数
+ * @param kd 微分系数
+ * @param out_max 最大输出绝对值（电流+-16384/电压+-25000）
+ * @param integral_max 积分限幅值
+ * @param integral_separate_threshold 积分分离阈值
+ * @param mode LIMITING 一直积分/SEPARATING 积分分离
+ * @retval 无
+ */
+
 void PID_Init(PID_t *pid,
               float kp,
               float ki,
               float kd,
-              float out_max,
+              float out_max,//电流或电压指令
               float integral_max,
               float integral_separate_threshold,
               uint8_t mode)
