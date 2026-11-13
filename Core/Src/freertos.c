@@ -186,18 +186,19 @@ void StartkeyTask(void *argument)
   /* USER CODE BEGIN StartkeyTask */
   (void) argument;
   /* Infinite loop */
-  int flag1 = 0;
+  /*舵机转动方向，1左，0右*/
+  int servo_dir = 0;
   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 500u);
   for (;;)
   {
     if (key_pressed == 1 && (HAL_GetTick() - key_tick >= 30))
     {
-      if (flag1 == 0)
+      if (servo_dir == 0)
       {
         servo_angle += 20;
         if (servo_angle >= 180)
         {
-          flag1 = 1;
+          servo_dir = 1;
           servo_angle = 180;
         }
       }
@@ -206,7 +207,7 @@ void StartkeyTask(void *argument)
         servo_angle -= 20;
         if (servo_angle <= 0)
         {
-          flag1 = 0;
+          servo_dir = 0;
           servo_angle = 0;
         }
       }
