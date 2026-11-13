@@ -35,16 +35,25 @@ void CAN_FilterInit(CAN_HandleTypeDef *hcan)
   __HAL_CAN_ENABLE_IT(hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
 }
 
+/**
+ * @brief 通信正常红灯关，上个任务要求
+ */
 void Motor_RightHandle(void)
 {
   HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
 }
-
+/**
+ * @brief 通信异常红灯亮，上个任务要求
+ */
 void Motor_ErrorHandle(void)
 {
   HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
 }
 
+/**
+ *
+ * @param hcan 
+ */
 void CAN_Init(CAN_HandleTypeDef *hcan)
 {
   if (hcan == &CHASSIS_CAN)
