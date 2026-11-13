@@ -59,9 +59,9 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 volatile uint8_t motor_online = 0;
-volatile int32_t servo_angle  = 0;
+volatile int32_t servo_angle_deg  = 0;
 volatile uint8_t key_pressed = 0;
-volatile uint32_t key_tick = 0;
+volatile uint32_t key_last_tick_mss = 0;
 
 /* USER CODE END Variables */
 /* Definitions for keyTask */
@@ -191,28 +191,28 @@ void StartkeyTask(void *argument)
   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 500u);
   for (;;)
   {
-    if (key_pressed == 1 && (HAL_GetTick() - key_tick >= 30))
+    if (key_pressed == 1 && (HAL_GetTick() - key_last_tick_ms >= 30))
     {
       if (servo_dir == 0)
       {
-        servo_angle += 20;
-        if (servo_angle >= 180)
+        servo_angle_deg += 20;
+        if (servo_angle_deg >= 180)
         {
           servo_dir = 1;
-          servo_angle = 180;
+          servo_angle_deg = 180;
         }
       }
       else
       {
-        servo_angle -= 20;
-        if (servo_angle <= 0)
+        servo_angle_deg -= 20;
+        if (servo_angle_deg <= 0)
         {
           servo_dir = 0;
-          servo_angle = 0;
+          servo_angle_deg = 0;
         }
       }
       __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1,
-                            500u+(uint32_t)servo_angle * 2000u / 180u);
+                            500u+(uint32_t)servo_angle_deg * 2000u / 180u);
       key_pressed = 0;
     }
     osDelay(10);
@@ -392,7 +392,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   {
     if (HAL_GPIO_ReadPin(KEY_GPIO_Port,KEY_Pin) == GPIO_PIN_RESET)
     {
-      key_tick = HAL_GetTick();
+      key_last_tick_ms = HAL_GetTick();
       key_pressed = 1;
     }
   }
