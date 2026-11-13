@@ -26,12 +26,12 @@ void CAN_cmd_chassis(int16_t motor1, int16_t motor2, int16_t motor3, int16_t mot
 void CAN_FILTER_Init(CAN_HandleTypeDef *hcan);
 
 typedef struct {
-  volatile uint16_t temp;
-  volatile uint16_t angle;
-  volatile int16_t speed;
-  volatile int16_t current;
-  volatile uint32_t last_time;
-  volatile uint32_t now;
+  volatile uint16_t temperature_c;
+  volatile uint16_t angle_raw;
+  volatile int16_t speed_rpm;
+  volatile int16_t current_raw;
+  volatile uint32_t last_rx_time_ms;
+  volatile uint32_t now_tick_ms;
 } MotorParam_t;
 
 extern MotorParam_t motor_parameter;
