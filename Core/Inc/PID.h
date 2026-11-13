@@ -19,12 +19,12 @@ typedef struct
   float last_error; //上次误差
   float target; //目标
   float output; //输出电压
-  float pout;
-  float iout;
-  float dout;
-  float maxout; //输出限幅
-  float imaxout1; //积分限幅
-  float imaxout2; //积分分离值rpm
+  float p_out;
+  float i_out;
+  float d_out;
+  float out_max; //输出限幅
+  float integral_max; //积分限幅
+  float integral_separate_threshold; //积分分离值rpm
   float feedback; //实际转速
   uint8_t mode;
 } PID_t;
@@ -37,9 +37,9 @@ void PID_Init(PID_t *pid,
               float kp,
               float ki,
               float kd,
-              float maxout1,
-              float imaxout1,
-              float imaxout2,
+              float out_max,
+              float integral_max,
+              float integral_separate_threshold,
               uint8_t mode);
 
 void PID_Calc(PID_t *pid,

@@ -21,8 +21,8 @@ void PID_Init(PID_t *pid,
               float ki,
               float kd,
               float maxout,
-              float imaxout1,
-              float imaxout2,
+              float integral_max,
+              float integral_separate_threshold,
               uint8_t mode)
 {
   if (pid != NULL)
@@ -31,9 +31,9 @@ void PID_Init(PID_t *pid,
     pid->kp = kp;
     pid->ki = ki;
     pid->kd = kd;
-    pid->maxout = fabsf(maxout);
-    pid->imaxout1 = fabsf(imaxout1);
-    pid->imaxout2 = fabsf(imaxout2);
+    pid->out_max = fabsf(maxout);
+    pid->integral_max = fabsf(integral_max);
+    pid->integral_separate_threshold = fabsf(integral_separate_threshold);
     pid->mode = mode;
   }
 }
@@ -45,38 +45,38 @@ void PID_Calc(PID_t *pid, float target, float back)
   pid->target = target;
   pid->feedback = back;
   pid->error = pid->target - pid->feedback;
-  pid->pout = pid->error * pid->kp;
+  pid->p_out = pid->error * pid->kp;
 
   if (pid->mode == LIMITING)
   {
-    pid->iout += pid->ki * pid->error;
+    pid->i_out += pid->ki * pid->error;
   }
   else
   {
-    if (fabsf(pid->error) <= pid->imaxout2)
+    if (fabsf(pid->error) <= pid->integral_separate_threshold)
     {
-      pid->iout = pid->iout + pid->ki * pid->error;
+      pid->i_out = pid->i_out + pid->ki * pid->error;
     }
   }
 
-  if (pid->iout > pid->imaxout1)
+  if (pid->i_out > pid->integral_max)
   {
-    pid->iout = pid->imaxout1;
+    pid->i_out = pid->integral_max;
   }
-  if (pid->iout < -pid->imaxout1)
+  if (pid->i_out < -pid->integral_max)
   {
-    pid->iout = -pid->imaxout1;
+    pid->i_out = -pid->integral_max;
   }
 
-  pid->dout = pid->kd * (pid->error - pid->last_error);
-  pid->output = pid->iout + pid->pout + pid->dout;
-  if (pid->output > pid->maxout)
+  pid->d_out = pid->kd * (pid->error - pid->last_error);
+  pid->output = pid->i_out + pid->p_out + pid->d_out;
+  if (pid->output > pid->out_max)
   {
-    pid->output = pid->maxout;
+    pid->output = pid->out_max;
   }
-  if (pid->output < -pid->maxout)
+  if (pid->output < -pid->out_max)
   {
-    pid->output = -pid->maxout;
+    pid->output = -pid->out_max;
   }
   pid->last_error = pid->error;
 }
@@ -87,9 +87,9 @@ void PID_Reset(PID_t *pid)
     return;
   pid->error = 0.0f;
   pid->last_error = 0.0f;
-  pid->pout = 0.0f;
-  pid->iout = 0.0f;
-  pid->dout = 0.0f;
+  pid->p_out = 0.0f;
+  pid->i_out = 0.0f;
+  pid->d_out = 0.0f;
   pid->output = 0.0f;
 }
 
