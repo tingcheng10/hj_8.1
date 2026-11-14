@@ -48,7 +48,16 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define SERVO_PWM_MIN        500u    /* 0° 对应的 PWM 比较值 */
+#define SERVO_PWM_MAX        2500u   /* 180° 对应的 PWM 比较值 */
+#define SERVO_ANGLE_MAX_DEG  180     /* 舵机最大角度° */
+#define SERVO_ANGLE_STEP_DEG 20        /* 每按一次键转动的角度 */
+#define KEY_DEBOUNCE_MS      30       /* 按键去抖时间 */
+#define MOTOR_OFFLINE_TIMEOUT_MS  100 /* 电机通信超时时间*/
+#define LED_PWM_MAX           1000 /* LED 呼吸灯的 PWM 满占空比*/
+#define LED_PWM_STEP          20 /* LED 呼吸灯的 PWM每步增大*/
+#define REPORT_PERIOD_MS      2000 /*串口发送周期*/
+#define SPEED_TARGET_MAX_RPM 150.0f/* 最大目标转速绝对值 */
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -188,23 +197,23 @@ void StartkeyTask(void *argument)
   /* Infinite loop */
   /*舵机转动方向，1左，0右*/
   int servo_dir = 0;
-  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 500u);
+  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, SERVO_PWM_MIN);
   for (;;)
   {
-    if (key_pressed == 1 && (HAL_GetTick() - key_last_tick_ms >= 30))
+    if (key_pressed == 1 && (HAL_GetTick() - key_last_tick_ms >= KEY_DEBOUNCE_MS))
     {
       if (servo_dir == 0)
       {
-        servo_angle_deg += 20;
-        if (servo_angle_deg >= 180)
+        servo_angle_deg += SERVO_ANGLE_STEP_DEG;
+        if (servo_angle_deg >= SERVO_ANGLE_MAX_DEG)
         {
           servo_dir = 1;
-          servo_angle_deg = 180;
+          servo_angle_deg = SERVO_ANGLE_MAX_DEG;
         }
       }
       else
       {
-        servo_angle_deg -= 20;
+        servo_angle_deg -= SERVO_ANGLE_STEP_DEG;
         if (servo_angle_deg <= 0)
         {
           servo_dir = 0;
@@ -212,7 +221,7 @@ void StartkeyTask(void *argument)
         }
       }
       __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1,
-                            500u+(uint32_t)servo_angle_deg * 2000u / 180u);
+             SERVO_PWM_MIN + (uint32_t)servo_angle_deg * (SERVO_PWM_MAX - SERVO_PWM_MIN) / SERVO_ANGLE_MAX_DEG);
       key_pressed = 0;
     }
     osDelay(10);
@@ -235,7 +244,7 @@ void StartmotorTask(void *argument)
   for (;;)
   {
     motor_parameter.now_tick_ms = HAL_GetTick();
-    if (motor_parameter.now_tick_ms - motor_parameter.last_rx_time_ms >= 100)
+    if (motor_parameter.now_tick_ms - motor_parameter.last_rx_time_ms >= MOTOR_OFFLINE_TIMEOUT_MS)
     {
       motor_online = 0;
       PID_Reset(&speed_pid);
@@ -291,8 +300,8 @@ void StartuartrxTask(void *argument)
             {
               speed_target = -(float) atoi(&line[6]);
             }
-            if (speed_target > 150.0f) speed_target = 150.0f;
-            if (speed_target < -150.0f) speed_target = -150.0f;
+            if (speed_target > SPEED_TARGET_MAX_RPM) speed_target = SPEED_TARGET_MAX_RPM;
+            if (speed_target < -SPEED_TARGET_MAX_RPM) speed_target = -SPEED_TARGET_MAX_RPM;
           }
           idx = 0;
         }
@@ -319,31 +328,29 @@ void StartledTask(void *argument)
   /* USER CODE BEGIN StartledTask */
   (void) argument;
   int32_t duty = 0;
-  int32_t step = 20;
   int8_t flag2 = 0;
   /* Infinite loop */
   for (;;)
   {
     if (motor_online == 1)
     {
-      __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_2, 1000);
+      __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_2, LED_PWM_MAX);
       __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_3, 0);
     } else
     {
       __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_2, 0);
-
       if (flag2 == 0)
       {
-        duty += step;
-        if (duty >= 1000)
+        duty += LED_PWM_STEP;
+        if (duty >= LED_PWM_MAX)
         {
-          duty = 1000;
+          duty = LED_PWM_MAX;
           flag2 = 1;
         }
       }
       else
       {
-        duty -= step;
+        duty -= LED_PWM_STEP;
         if (duty <= 0)
         {
           duty = 0;
@@ -381,7 +388,7 @@ void StartuarttxTask(void *argument)
 
     HAL_UART_Transmit(&huart6, (uint8_t *) buf, (uint16_t) len, 100);
 
-    osDelay(2000);
+    osDelay(REPORT_PERIOD_MS);
   }
   /* USER CODE END StartuarttxTask */
 }
