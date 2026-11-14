@@ -16,9 +16,10 @@ static uint32_t send_mailbox;
 
 /**
  * @brief 放行ID=0x205，使能过滤器，启动can开fifo0中断
- * @param hcan 要配置的 CAN 句柄，只处理 &CHASSIS_CAN（hcan1
+ * @param hcan 要配置的 CAN 句柄，只处理 &CHASSIS_CAN（hcan1）
  * @retval 无
  */
+
 void CAN_FilterInit(CAN_HandleTypeDef *hcan)
 {
   CAN_FilterTypeDef filter = {0};
@@ -42,13 +43,16 @@ void CAN_FilterInit(CAN_HandleTypeDef *hcan)
 /**
  * @brief 通信正常红灯关，上个任务要求
  */
+
 void Motor_RightHandle(void)
 {
   HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
 }
+
 /**
  * @brief 通信异常红灯亮，上个任务要求
  */
+
 void Motor_ErrorHandle(void)
 {
   HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
@@ -60,6 +64,7 @@ void Motor_ErrorHandle(void)
  * @retval 无
  * * @note   帧头只需填一次，之后每次发送复用同一份 chassis_tx_message
  */
+
 void CAN_Init(CAN_HandleTypeDef *hcan)
 {
   if (hcan == &CHASSIS_CAN)
@@ -72,6 +77,7 @@ void CAN_Init(CAN_HandleTypeDef *hcan)
     chassis_tx_message.TransmitGlobalTime = DISABLE;
   }
 }
+
 /**
  * @brief  向底盘 4 个电机下发电流指令：把 4 个 int16 拆成 8 个字节发出
  * @param  motor1  1 号电机电流指令值，范围 -16384 ~ +16384
@@ -95,6 +101,7 @@ void CAN_CmdChassis(int16_t motor1, int16_t motor2, int16_t motor3, int16_t moto
   tx_data[7] = (uint8_t) (motor4 & 0xff);
   HAL_CAN_AddTxMessage(&CHASSIS_CAN, &chassis_tx_message, tx_data, &send_mailbox);
 }
+
 /**
  * @brief  解析一帧电机反馈：把 rx_data 的 8 个字节拆成角度、转速、电流、温度
  * @param  无
@@ -110,6 +117,7 @@ static void Motor_ParseRxData(void)
   motor_parameter.current_raw = (int16_t) ((uint16_t) rx_data[4] << 8) | rx_data[5];
   motor_parameter.temperature_c = rx_data[6];
 }
+
 /**
  * @brief  CAN FIFO0 收到新消息时的回调：校验来源与 ID，记录时刻并解析数据
  * @param  hcan  触发本次中断的 CAN 句柄
@@ -118,6 +126,7 @@ static void Motor_ParseRxData(void)
  *         只处理底盘那一路 CAN 且 ID 为 MOTOR_CAN_RX_ID(0x205) 的帧，
  *         其它帧直接 return；收到有效帧先更新 last_rx_time_ms（供上层判超时）
  */
+
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
   if (hcan != &CHASSIS_CAN)
