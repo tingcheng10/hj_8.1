@@ -328,7 +328,7 @@ void StartledTask(void *argument)
   /* USER CODE BEGIN StartledTask */
   (void) argument;
   int32_t duty = 0;
-  int8_t flag2 = 0;
+  int8_t led_fade_dir = 0;//0渐亮，1渐暗
   /* Infinite loop */
   for (;;)
   {
@@ -339,13 +339,13 @@ void StartledTask(void *argument)
     } else
     {
       __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_2, 0);
-      if (flag2 == 0)
+      if (led_fade_dir == 0)
       {
         duty += LED_PWM_STEP;
         if (duty >= LED_PWM_MAX)
         {
           duty = LED_PWM_MAX;
-          flag2 = 1;
+          led_fade_dir = 1;
         }
       }
       else
@@ -354,7 +354,7 @@ void StartledTask(void *argument)
         if (duty <= 0)
         {
           duty = 0;
-          flag2 = 0;
+          led_fade_dir = 0;
         }
       }
 
