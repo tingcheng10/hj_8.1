@@ -176,7 +176,7 @@ void MX_FREERTOS_Init(void) {
 
 /* USER CODE BEGIN Header_StartkeyTask */
 /**
-  * @brief  Function implementing the keyTask thread.
+  * @brief   按键任务：按一次键舵机转 20°，在 0~180° 之间来回摆动
   * @param  argument: Not used
   * @retval None
   */
@@ -222,7 +222,7 @@ void StartkeyTask(void *argument)
 
 /* USER CODE BEGIN Header_StartmotorTask */
 /**
-* @brief Function implementing the motorTask thread.
+* @brief 电机控制任务：判断通信是否正常，正常则跑速度环 PID 并下发电流，输出直接作为电流指令
 * @param argument: Not used
 * @retval None
 */
@@ -256,9 +256,11 @@ void StartmotorTask(void *argument)
 
 /* USER CODE BEGIN Header_StartuartrxTask */
 /**
-* @brief Function implementing the uartrxTask thread.
+* @brief 串口接收任务：从队列取字节拼成一行，解析速度指令
 * @param argument: Not used
 * @retval None
+* @note   以 \r 或 \n 作为一行的结束；只认 "motor+xx" / "motor-xx" 格式，
+*         解析出整数写入 speed_target，并限幅到 ±150 rpm
 */
 /* USER CODE END Header_StartuartrxTask */
 void StartuartrxTask(void *argument)
@@ -307,7 +309,7 @@ void StartuartrxTask(void *argument)
 
 /* USER CODE BEGIN Header_StartledTask */
 /**
-* @brief Function implementing the ledTask thread.
+* @brief LED 任务：按电机在线状态控制红绿两灯
 * @param argument: Not used
 * @retval None
 */
@@ -359,7 +361,7 @@ void StartledTask(void *argument)
 
 /* USER CODE BEGIN Header_StartuarttxTask */
 /**
-* @brief Function implementing the uarttxTask thread.
+* @brief  串口发送任务：每 2 秒上报一次实际转速，串口传到电脑
 * @param argument: Not used
 * @retval None
 */
@@ -386,6 +388,13 @@ void StartuarttxTask(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+/*以下都为弱函数*/
+/**
+ * @brief  外部中断回调：按键按下时记录时刻并置标志
+ * @param GPIO_Pin 中断触发引脚
+ * @retval 无
+ */
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   if (GPIO_Pin == KEY_Pin)
@@ -398,6 +407,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   }
 }
 
+/**
+ *@brief 串口接收完成回调：把收到的 1 个字节放进队列
+ * @param huart huart  触发回调的串口句柄
+ * @retval 无
+ */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   if (huart->Instance == USART6)
