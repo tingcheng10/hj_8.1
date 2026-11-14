@@ -102,15 +102,28 @@ int main(void)
   MX_USART6_UART_Init();
   MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
+  /* 配置 CAN 过滤器：只放行 ID=0x205 的反馈帧，并开启 FIFO0 接收中断 */
   CAN_FilterInit(&CHASSIS_CAN);
+  /* 填好发送帧头（0x1FF、标准帧、数据帧、8 字节）准备发送1*/
   CAN_Init(&CHASSIS_CAN);
+/*记一次时间，防止上电误判超时*/
   motor_parameter.last_rx_time_ms = HAL_GetTick();
+  /* 初始化速度环 PID：
+       Kp=50、Ki=0.5、Kd=0，输出限幅 15000，
+       积分限幅 10000，积分分离阈值 30 rpm，一直积分模式 */
   PID_Init(&speed_pid, 50.0f, 0.5f, 0.0f, 15000.0f, 10000.0f, 30.0f, LIMITING);
+  /* 上电时目标转速先置 0，等电脑输入指令改变目标转速 */
   speed_target = 0.0f;
+  /* 启动三路 PWM：TIM1_CH1 驱动舵机，TIM5_CH2/CH3 驱动红绿 LED */
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+
   HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_2);
+
   HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_3);
+
+  /*初始舵机角度为0°，500~2500对应0~180°*/
   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 500);
+  /*开启串口单字节中断接收，之后每收到 1 字节就触发 HAL_UART_RxCpltCallback*/
   HAL_UART_Receive_IT(&huart6, &rx_byte, 1);
 
   /* USER CODE END 2 */
